@@ -1,7 +1,6 @@
 package com.smartmovesystems.keycloak.firebasemigrator
 
-import com.smartmovesystems.keycloak.firebasemigrator.model.FirebaseUser
-import com.smartmovesystems.keycloak.firebasemigrator.model.ScryptPasswordCredentialData
+import com.smartmovesystems.keycloak.firebasemigrator.model.*
 import org.keycloak.OAuth2Constants
 import org.keycloak.admin.client.CreatedResponseUtil
 import org.keycloak.admin.client.KeycloakBuilder
@@ -20,7 +19,7 @@ private val log = Logger.getLogger("createUsers")
 fun createUsers(arguments: Arguments) {
 
     log.info("Parsing users file...")
-    val users = parseFirebaseUsers(arguments.fileName)
+    val users = parseFile<UserList>(arguments.fileName)
 
     if (users != null) {
 
@@ -38,7 +37,7 @@ fun createUsers(arguments: Arguments) {
         val realmResource = keycloak.realm(arguments.realm)
         val usersResource = realmResource.users()
 
-        parseFirebaseHashParameters(arguments.hashParamsFile)?.let {
+        parseFile<FirebaseHashConfig>(arguments.hashParamsFile)?.let {
             createHashParameters(keycloak, arguments.realm, arguments.serverUrl, it.hash_config)
         }
 
@@ -52,8 +51,6 @@ fun createUsers(arguments: Arguments) {
         log.warning("No users found in file")
     }
 }
-
-
 
 fun createOneUser(user: FirebaseUser, usersResource: UsersResource): UserResource? {
     log.info("Creating user ${user.email}...")

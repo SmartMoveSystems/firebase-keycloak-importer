@@ -6,6 +6,8 @@ import java.lang.Exception
 data class Arguments(
     val fileName: String,
     val hashParamsFile: String,
+    val adminUser: String,
+    val adminPassword: String,
     val realm: String,
     val serverUrl: String,
     val clientId: String?,
@@ -19,6 +21,8 @@ data class Arguments(
             "--usersFile",
             "--hashParamsFile",
             "--realm",
+            "--adminUser",
+            "--adminPassword",
             "--serverUrl"
         )
         val OPTIONAL_ARGS = arrayOf( "--clientId", "--roles", "--clientSecret", "--default")
@@ -49,6 +53,8 @@ fun fromStringArray(args: Array<String>): Arguments {
             argMap[REQUIRED_ARGS[1]]!!,
             argMap[REQUIRED_ARGS[2]]!!,
             argMap[REQUIRED_ARGS[3]]!!,
+            argMap[REQUIRED_ARGS[4]]!!,
+            argMap[REQUIRED_ARGS[5]]!!,
             argMap[Arguments.OPTIONAL_ARGS[0]],
             argMap[Arguments.OPTIONAL_ARGS[1]]?.split(","),
             argMap[Arguments.OPTIONAL_ARGS[2]],

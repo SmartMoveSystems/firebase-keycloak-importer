@@ -39,7 +39,8 @@ The `default` argument specifies that the imported hash parameters will be the o
 ```bash
 java -jar firebase-export-to-keycloak-import-0.0.1.jar --usersFile exported_firebase_users.json \
                                                        --hashParamsFile hash_params.json \
-                                                       
+                                                       --adminUser admin \
+                                                       --adminPassword admin \
                                                        --realm master \
                                                        --serverUrl http://localhost:8080/auth \
                                                        --appId your_keycloak_client_app_id \
