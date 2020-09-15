@@ -1,0 +1,14 @@
+# Gradle
+.gradle
+build
+
+# IDE
+.idea
+*.iml
+
+# Maven
+target
+
+# Docker
+docker/*.jar
+.env
