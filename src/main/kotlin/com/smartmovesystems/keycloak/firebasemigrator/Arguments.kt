@@ -6,9 +6,9 @@ import java.lang.Exception
 data class Arguments(
     val fileName: String,
     val hashParamsFile: String,
+    val realm: String,
     val adminUser: String,
     val adminPassword: String,
-    val realm: String,
     val serverUrl: String,
     val clientId: String?,
     val roles: List<String>?,

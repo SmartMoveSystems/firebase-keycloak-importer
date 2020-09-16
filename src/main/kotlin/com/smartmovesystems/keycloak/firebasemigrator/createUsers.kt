@@ -24,6 +24,7 @@ fun createUsers(arguments: Arguments) {
     if (users != null) {
 
         log.info("Found ${users.users.size} users in file.")
+        log.info("About to connect to Keycloak instance at ${arguments.serverUrl} as user ${arguments.adminUser}")
         val keycloak = KeycloakBuilder.builder()
             .serverUrl(arguments.serverUrl)
             .realm(arguments.realm)
@@ -38,6 +39,7 @@ fun createUsers(arguments: Arguments) {
         val usersResource = realmResource.users()
 
         val hashParamsId = parseFile<FirebaseHashConfig>(arguments.hashParamsFile)?.let {
+            log.info("Adding scrypt hash parameters...")
             createHashParameters(keycloak, arguments.realm, arguments.serverUrl, it.hash_config, arguments.default)
         }
 

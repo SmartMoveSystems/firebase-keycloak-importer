@@ -13,7 +13,7 @@ To be used on a Keycloak instance configured with with the [Keycloak Firebase Sc
 ## Download latest release
 
 ```
-curl -L https://github.com/SmartMoveSystems/keycloak-firebase-scrypt/releases/download/0.0.1/firebase-export-to-keycloak-import-0.0.1.jar > firebase-export-to-keycloak-import-0.0.1.jar
+curl -L https://github.com/SmartMoveSystems/firebase-keycloak-importer/releases/download/0.0.1/firebase-keycloak-importer-0.0.1.jar > firebase-keycloak-importer-0.0.1.jar
 ```
 
 ## Usage
@@ -38,7 +38,7 @@ The `default` argument specifies that the imported hash parameters will be the o
 If you are only importing from one Firebase project, you must set this argument to `true`.
 
 ```bash
-java -jar firebase-export-to-keycloak-import-0.0.1.jar --usersFile exported_firebase_users.json \
+java -jar firebase-keycloak-importer-0.0.1.jar --usersFile exported_firebase_users.json \
                                                        --hashParamsFile hash_params.json \
                                                        --adminUser admin \
                                                        --adminPassword admin \
