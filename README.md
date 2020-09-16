@@ -23,18 +23,19 @@ Export your Firebase user database to a JSON file using the [Firebase CLI](https
 Export your Firebase project's hash parameters to a JSON file with the format:
 
 ```
-hash_config {
-  algorithm: SCRYPT,
-  base64_signer_key: jxspr8Ki0RYycVU8zykbdLGjFQ3McFUH0uiiTvC8pVMXAn210wjLNmdZJzxUECKbm0QsEmYUSDzZvpjeJ9WmXA==,
-  base64_salt_separator: Bw==,
-  rounds: 8,
-  mem_cost: 14,
+"hash_config" {
+  "algorithm": "SCRYPT",
+  "base64_signer_key": "jxspr8Ki0RYycVU8zykbdLGjFQ3McFUH0uiiTvC8pVMXAn210wjLNmdZJzxUECKbm0QsEmYUSDzZvpjeJ9WmXA==",
+  "base64_salt_separator": "Bw==",
+  "rounds": 8,
+  "mem_cost": 14,
 }
 ```
 
 Run the following (the args `"--clientId", "--roles", "--clientSecret", "--default"` are optional):
 
-The `default` argument specifies that the imported hash parameters will be the ones used for future users.
+The `default` argument specifies that the imported hash parameters will be the ones used for future users. 
+If you are only importing from one Firebase project, you must set this argument to `true`.
 
 ```bash
 java -jar firebase-export-to-keycloak-import-0.0.1.jar --usersFile exported_firebase_users.json \
@@ -43,7 +44,7 @@ java -jar firebase-export-to-keycloak-import-0.0.1.jar --usersFile exported_fire
                                                        --adminPassword admin \
                                                        --realm master \
                                                        --serverUrl http://localhost:8080/auth \
-                                                       --appId your_keycloak_client_app_id \
+                                                       --clientId your_keycloak_client_app_id \
                                                        --roles oneRole,anotherRole \
                                                        --clientSecret 0d61686d-57fc-4048-b052-4ce74978c468 \
                                                        --default true

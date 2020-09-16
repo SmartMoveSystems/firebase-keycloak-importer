@@ -30,19 +30,19 @@ fun createUsers(arguments: Arguments) {
             .grantType(OAuth2Constants.PASSWORD)
             .clientId("admin-cli")
             .clientSecret(arguments.clientSecret)
-            .username("admin")
-            .password("admin")
+            .username(arguments.adminUser)
+            .password(arguments.adminPassword)
             .build()
 
         val realmResource = keycloak.realm(arguments.realm)
         val usersResource = realmResource.users()
 
-        parseFile<FirebaseHashConfig>(arguments.hashParamsFile)?.let {
-            createHashParameters(keycloak, arguments.realm, arguments.serverUrl, it.hash_config)
+        val hashParamsId = parseFile<FirebaseHashConfig>(arguments.hashParamsFile)?.let {
+            createHashParameters(keycloak, arguments.realm, arguments.serverUrl, it.hash_config, arguments.default)
         }
 
         users.users.forEach {
-            createOneUser(it, usersResource)?.let { user ->
+            createOneUser(it, usersResource, hashParamsId)?.let { user ->
                 addUserRoles(user, realmResource, arguments.clientId, arguments.roles ?: emptyList())
             }
         }
@@ -52,18 +52,31 @@ fun createUsers(arguments: Arguments) {
     }
 }
 
-fun createOneUser(user: FirebaseUser, usersResource: UsersResource): UserResource? {
+fun createOneUser(user: FirebaseUser, usersResource: UsersResource, hashParamsId: String?): UserResource? {
     log.info("Creating user ${user.email}...")
     val keycloakUser = user.convert()
-    try {
+    return try {
         val response: Response = usersResource.create(keycloakUser)
         val userId = CreatedResponseUtil.getCreatedId(response)
+        val resource = usersResource.get(userId)
+        addUserCredential(resource, user, hashParamsId)
         log.info("Created user ID $userId")
-        return usersResource.get(userId)
+        usersResource.get(userId)
     } catch (e: Exception) {
         log.warning("Error creating user: ${e.message}")
-        return null
+        null
     }
+}
+
+fun addUserCredential(userResource: UserResource, user: FirebaseUser, hashParamsId: String?) {
+    val credential = CredentialRepresentation()
+    val representation = userResource.toRepresentation()
+    credential.isTemporary = false
+    credential.credentialData = ScryptPasswordCredentialData().jsonData
+    credential.secretData = "{\"value\":\"${user.passwordHash}\$$hashParamsId\",\"salt\":\"${user.salt}\"}"
+    credential.type = CredentialRepresentation.PASSWORD
+    representation.credentials = listOf(credential)
+    userResource.update(representation)
 }
 
 fun addUserRoles(userResource: UserResource, realmResource: RealmResource, clientId: String?, roles: List<String>) {
@@ -109,14 +122,6 @@ fun FirebaseUser.convert() : UserRepresentation {
         user.attributes = hashMapOf("PHONE_VERIFIED" to listOf("true"))
         user.attributes = hashMapOf("PHONE_NUMBER" to listOf(it))
     }
-
-    val credential = CredentialRepresentation()
-    credential.isTemporary = false
-    credential.type = CredentialRepresentation.SECRET
-    credential.credentialData = ScryptPasswordCredentialData("1").jsonData
-    credential.secretData = "{\"value\":\"$passwordHash\",\"salt\":\"$salt\"}"
-
-    user.credentials = listOf(credential)
 
     return user
 }

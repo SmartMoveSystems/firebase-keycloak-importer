@@ -5,7 +5,6 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 
 data class ScryptPasswordCredentialData(
-    val hashParametersId: String,
     val hashIterations: Int = 0,
     val algorithm: String = "firebase-scrypt"
 ) {
