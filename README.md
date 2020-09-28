@@ -23,12 +23,14 @@ Export your Firebase user database to a JSON file using the [Firebase CLI](https
 Export your Firebase project's hash parameters to a JSON file with the format:
 
 ```
-"hash_config" {
-  "algorithm": "SCRYPT",
-  "base64_signer_key": "jxspr8Ki0RYycVU8zykbdLGjFQ3McFUH0uiiTvC8pVMXAn210wjLNmdZJzxUECKbm0QsEmYUSDzZvpjeJ9WmXA==",
-  "base64_salt_separator": "Bw==",
-  "rounds": 8,
-  "mem_cost": 14,
+{
+    "hash_config": {
+      "algorithm": "SCRYPT",
+      "base64_signer_key": "jxspr8Ki0RYycVU8zykbdLGjFQ3McFUH0uiiTvC8pVMXAn210wjLNmdZJzxUECKbm0QsEmYUSDzZvpjeJ9WmXA==",
+      "base64_salt_separator": "Bw==",
+      "rounds": 8,
+      "mem_cost": 14,
+    }
 }
 ```
 
@@ -38,8 +40,8 @@ The `default` argument specifies that the imported hash parameters will be the o
 If you are only importing from one Firebase project, you must set this argument to `true`.
 
 ```bash
-java -jar firebase-keycloak-importer-0.0.1.jar --usersFile exported_firebase_users.json \
-                                                       --hashParamsFile hash_params.json \
+java -jar firebase-keycloak-importer-0.0.1.jar --usersFile example_users.json \
+                                                       --hashParamsFile example_hash_config.json \
                                                        --adminUser admin \
                                                        --adminPassword admin \
                                                        --realm master \

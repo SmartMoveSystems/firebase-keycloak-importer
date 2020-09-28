@@ -1,0 +1,9 @@
+{
+  "hash_config": {
+    "algorithm": "SCRYPT",
+    "base64_signer_key": "jxspr8Ki0RYycVU8zykbdLGjFQ3McFUH0uiiTvC8pVMXAn210wjLNmdZJzxUECKbm0QsEmYUSDzZvpjeJ9WmXA==",
+    "base64_salt_separator": "Bw==",
+    "rounds": 8,
+    "mem_cost": 14
+  }
+}

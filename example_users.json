@@ -1,0 +1,12 @@
+{
+  "users": [
+    {
+      "email": "test@example.com",
+      "emailVerified": true,
+      "passwordHash": "lSrfV15cpx95/sZS2W9c9Kp6i/LVgQNDNC/qzrCnh1SAyZvqmZqAjTdn3aoItz+VHjoZilo78198JAdRuid5lQ==",
+      "salt": "42xEC+ixf3L2lw==",
+      "displayName": "Test User",
+      "phoneNumber": "+6124567890"
+    }
+  ]
+}
