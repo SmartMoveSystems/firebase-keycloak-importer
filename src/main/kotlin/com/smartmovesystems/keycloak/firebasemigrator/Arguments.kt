@@ -58,7 +58,7 @@ fun fromStringArray(args: Array<String>): Arguments {
             argMap[Arguments.OPTIONAL_ARGS[0]],
             argMap[Arguments.OPTIONAL_ARGS[1]]?.split(","),
             argMap[Arguments.OPTIONAL_ARGS[2]],
-            argMap[Arguments.OPTIONAL_ARGS[2]]?.toBoolean() ?: false
+            argMap[Arguments.OPTIONAL_ARGS[3]]?.toBoolean() ?: false
         )
     } catch (e: Exception) {
         throw IllegalArgumentException("Badly formatted argument", e)
