@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.smartmovesystems.keycloak.firebasemigrator"
-version = "0.0.2"
+version = "0.0.3"
 
 repositories {
     mavenCentral()
