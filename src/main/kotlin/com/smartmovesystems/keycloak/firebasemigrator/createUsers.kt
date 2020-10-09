@@ -1,6 +1,7 @@
 package com.smartmovesystems.keycloak.firebasemigrator
 
 import com.smartmovesystems.keycloak.firebasemigrator.model.*
+import org.json.JSONObject
 import org.keycloak.OAuth2Constants
 import org.keycloak.admin.client.CreatedResponseUtil
 import org.keycloak.admin.client.KeycloakBuilder
@@ -121,8 +122,15 @@ fun FirebaseUser.convert() : UserRepresentation {
     }
 
     phoneNumber?.let {
-        user.attributes = hashMapOf("PHONE_VERIFIED" to listOf("true"))
-        user.attributes = hashMapOf("PHONE_NUMBER" to listOf(it))
+        user.singleAttribute("phone_verified","true")
+        user.singleAttribute("phone_number", it)
+    }
+
+    customAttributes?.let { attrString ->
+        val json = JSONObject(attrString)
+        json.keys().forEachRemaining {
+            user.singleAttribute(it, json.get(it).toString())
+        }
     }
 
     return user

@@ -21,6 +21,7 @@ dependencies {
     implementation("org.keycloak:keycloak-admin-client:$keycloakVersion")
     implementation("com.squareup.moshi:moshi:1.9.3")
     implementation("com.squareup.moshi:moshi-kotlin:1.9.3")
+    implementation("org.json:json:20200518")
     compileOnly("org.keycloak:keycloak-core:$keycloakVersion")
 }
 
