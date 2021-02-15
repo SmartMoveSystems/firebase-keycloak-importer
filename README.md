@@ -13,7 +13,7 @@ To be used on a Keycloak instance configured with with the [Keycloak Firebase Sc
 ## Download latest release
 
 ```
-curl -L https://github.com/SmartMoveSystems/firebase-keycloak-importer/releases/download/0.0.3/firebase-keycloak-importer-0.0.3.jar > firebase-keycloak-importer-0.0.3.jar
+curl -L https://github.com/SmartMoveSystems/firebase-keycloak-importer/releases/download/0.0.4/firebase-keycloak-importer-0.0.4.jar > firebase-keycloak-importer-0.0.4.jar
 ```
 
 ## Usage
@@ -34,22 +34,19 @@ Export your Firebase project's hash parameters to a JSON file with the format:
 }
 ```
 
-Run the following (the args `"--clientId", "--roles", "--clientSecret", "--default"` are optional):
+Run the following (the args `"--clientId", "--roles", "--clientSecret", "--default", "--debug"` are optional):
 
 The `default` argument specifies that the imported hash parameters will be the ones used for future users. 
 If you are only importing from one Firebase project, you must set this argument to `true`.
 
 ```bash
-java -jar firebase-keycloak-importer-0.0.3.jar --usersFile example_users.json \
-                                                       --hashParamsFile example_hash_config.json \
-                                                       --adminUser admin \
-                                                       --adminPassword admin \
-                                                       --realm master \
-                                                       --serverUrl http://localhost:8080/auth \
-                                                       --clientId your_keycloak_client_app_id \
-                                                       --roles oneRole,anotherRole \
-                                                       --clientSecret 0d61686d-57fc-4048-b052-4ce74978c468 \
-                                                       --default true
+java -jar build\libs\firebase-keycloak-importer-0.0.4.jar --usersFile example_users.json --hashParamsFile example_hash_config.json --adminUser support@smartmovetaxis.com --adminPassword admin --realm smartmove --serverUrl http://localhost:8080/auth --default true --debug
 ```
 
 The client with the specified `clientId` and all specified `roles` must already exist in your Keycloak configuration.
+
+## Importing from multiple projects
+
+If there is a user with the same email address between multiple imported projects, the first imported user record wins.
+
+The only difference is that the `phone_verified` claim is set to false if the imported phone numbers differ between projects.

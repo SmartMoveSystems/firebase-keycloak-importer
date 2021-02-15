@@ -12,12 +12,16 @@ import org.keycloak.representations.idm.ClientRepresentation
 import org.keycloak.representations.idm.CredentialRepresentation
 import org.keycloak.representations.idm.UserRepresentation
 import java.lang.Exception
+import java.util.logging.Level
+import java.util.logging.LogManager
 import java.util.logging.Logger
 import javax.ws.rs.core.Response
 
 private val log = Logger.getLogger("createUsers")
 
 fun createUsers(arguments: Arguments) {
+
+    setLogLevel(arguments.debug)
 
     log.info("Parsing users file...")
     val users = parseFile<UserList>(arguments.fileName)
@@ -44,29 +48,69 @@ fun createUsers(arguments: Arguments) {
             createHashParameters(keycloak, arguments.realm, arguments.serverUrl, it.hash_config, arguments.default)
         }
 
+        val size = users.users.size
+        var created = 0
+
         users.users.forEach {
             createOneUser(it, usersResource, hashParamsId)?.let { user ->
                 addUserRoles(user, realmResource, arguments.clientId, arguments.roles ?: emptyList())
+                created++
             }
         }
-        log.info("Users added")
+        log.info("$created of $size users added")
     } else {
         log.warning("No users found in file")
     }
 }
 
+fun setLogLevel(debug: Boolean) {
+    val rootLogger: Logger = LogManager.getLogManager().getLogger("")
+    val level = if (debug) Level.FINE else Level.INFO
+    rootLogger.level = level
+    for (h in rootLogger.handlers) {
+        h.level = level
+    }
+}
+
 fun createOneUser(user: FirebaseUser, usersResource: UsersResource, hashParamsId: String?): UserResource? {
-    log.info("Creating user ${user.email}...")
+    log.fine("Creating user ${user.email}...")
     val keycloakUser = user.convert()
     return try {
         val response: Response = usersResource.create(keycloakUser)
         val userId = CreatedResponseUtil.getCreatedId(response)
         val resource = usersResource.get(userId)
         addUserCredential(resource, user, hashParamsId)
-        log.info("Created user ID $userId")
+        log.fine("Created user ID $userId")
         usersResource.get(userId)
     } catch (e: Exception) {
-        log.warning("Error creating user: ${e.message}")
+        log.warning("Error creating user: $e")
+        if (e.message?.contains("Create method returned status Conflict") == true) {
+            duplicateEmail(user, usersResource)
+        } else {
+            null
+        }
+
+    }
+}
+
+fun duplicateEmail(user: FirebaseUser, usersResource: UsersResource): UserResource? {
+    log.info("Trying to find existing user with email ${user.email}")
+    val users = usersResource.search(user.email, true)
+    return if (users.size == 1) {
+        log.info("Found the user with id ${users[0].id}")
+        val phoneNumber = users[0].attributes?.get("phone_number")?.firstOrNull()
+        val existing = usersResource.get(users[0].id)
+        if (phoneNumber != user.phoneNumber) {
+            log.info("User's phone number doesn't match; setting to invalid")
+            val representation = existing.toRepresentation()
+            representation.singleAttribute("phone_verified", "false")
+            existing.update(representation)
+        } else {
+            log.info("Phone numbers match; nothing to do here")
+        }
+        existing
+    } else {
+        log.severe("There were ${users.size} users with this email address. Cannot update.")
         null
     }
 }
@@ -84,7 +128,7 @@ fun addUserCredential(userResource: UserResource, user: FirebaseUser, hashParams
 
 fun addUserRoles(userResource: UserResource, realmResource: RealmResource, clientId: String?, roles: List<String>) {
 
-    log.info("Adding roles for user...")
+    log.fine("Adding roles for user...")
 
     // Add realm-level offline_access role to allow refresh token flow
     val role = realmResource.roles()["offline_access"].toRepresentation()
@@ -95,13 +139,13 @@ fun addUserRoles(userResource: UserResource, realmResource: RealmResource, clien
         val appClient: ClientRepresentation = realmResource.clients()
             .findByClientId(id)[0]
 
-        log.info("Found appClient: ${appClient.id}")
+        log.fine("Found appClient: ${appClient.id}")
 
         roles.forEach {
             val userClientRole = realmResource.clients()[appClient.id]
                 .roles()[it].toRepresentation()
 
-            log.info("Found userClientRole: ${userClientRole.id}")
+            log.fine("Found userClientRole: ${userClientRole.id}")
 
             // Assign client level role to user
             userResource.roles()

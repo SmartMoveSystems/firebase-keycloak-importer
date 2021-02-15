@@ -13,7 +13,8 @@ data class Arguments(
     val clientId: String?,
     val roles: List<String>?,
     val clientSecret: String?,
-    val default: Boolean
+    val default: Boolean,
+    val debug: Boolean
 ) {
 
     companion object {
@@ -25,7 +26,7 @@ data class Arguments(
             "--adminPassword",
             "--serverUrl"
         )
-        val OPTIONAL_ARGS = arrayOf( "--clientId", "--roles", "--clientSecret", "--default")
+        val OPTIONAL_ARGS = arrayOf( "--clientId", "--roles", "--clientSecret", "--default", "--debug")
     }
 }
 
@@ -58,7 +59,8 @@ fun fromStringArray(args: Array<String>): Arguments {
             argMap[Arguments.OPTIONAL_ARGS[0]],
             argMap[Arguments.OPTIONAL_ARGS[1]]?.split(","),
             argMap[Arguments.OPTIONAL_ARGS[2]],
-            argMap[Arguments.OPTIONAL_ARGS[3]]?.toBoolean() ?: false
+            argMap[Arguments.OPTIONAL_ARGS[3]]?.toBoolean() ?: false,
+            argMap[Arguments.OPTIONAL_ARGS[4]]?.toBoolean() ?: false
         )
     } catch (e: Exception) {
         throw IllegalArgumentException("Badly formatted argument", e)
