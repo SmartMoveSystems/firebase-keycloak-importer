@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.smartmovesystems.keycloak.firebasemigrator"
-version = "0.0.4"
+version = "0.0.5"
 
 repositories {
     mavenCentral()
@@ -21,6 +21,8 @@ dependencies {
     implementation("org.keycloak:keycloak-admin-client:$keycloakVersion")
     implementation("com.squareup.moshi:moshi:1.9.3")
     implementation("com.squareup.moshi:moshi-kotlin:1.9.3")
+    implementation("org.apache.httpcomponents:httpcore-nio:4.4.14")
+    implementation("org.apache.httpcomponents:httpasyncclient:4.1.4")
     implementation("org.json:json:20200518")
     compileOnly("org.keycloak:keycloak-core:$keycloakVersion")
 }

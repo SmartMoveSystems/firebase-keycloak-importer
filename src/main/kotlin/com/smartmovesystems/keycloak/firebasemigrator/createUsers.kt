@@ -2,9 +2,7 @@ package com.smartmovesystems.keycloak.firebasemigrator
 
 import com.smartmovesystems.keycloak.firebasemigrator.model.*
 import org.json.JSONObject
-import org.keycloak.OAuth2Constants
-import org.keycloak.admin.client.CreatedResponseUtil
-import org.keycloak.admin.client.KeycloakBuilder
+import org.keycloak.admin.client.*
 import org.keycloak.admin.client.resource.RealmResource
 import org.keycloak.admin.client.resource.UserResource
 import org.keycloak.admin.client.resource.UsersResource
@@ -27,21 +25,9 @@ fun createUsers(arguments: Arguments) {
     val users = parseFile<UserList>(arguments.fileName)
 
     if (users != null) {
-
         log.info("Found ${users.users.size} users in file.")
         log.info("About to connect to Keycloak instance at ${arguments.serverUrl} as user ${arguments.adminUser}")
-        val keycloak = KeycloakBuilder.builder()
-            .serverUrl(arguments.serverUrl)
-            .realm(arguments.realm)
-            .grantType(OAuth2Constants.PASSWORD)
-            .clientId("admin-cli")
-            .clientSecret(arguments.clientSecret)
-            .username(arguments.adminUser)
-            .password(arguments.adminPassword)
-            .build()
-
-        val realmResource = keycloak.realm(arguments.realm)
-        val usersResource = realmResource.users()
+        val keycloak = getKcInstance(arguments)
 
         val hashParamsId = parseFile<FirebaseHashConfig>(arguments.hashParamsFile)?.let {
             log.info("Adding scrypt hash parameters...")
@@ -52,6 +38,8 @@ fun createUsers(arguments: Arguments) {
         var created = 0
 
         users.users.forEach {
+            val realmResource = keycloak.realm(arguments.realm)
+            val usersResource = realmResource.users()
             createOneUser(it, usersResource, hashParamsId)?.let { user ->
                 addUserRoles(user, realmResource, arguments.clientId, arguments.roles ?: emptyList())
                 created++
@@ -63,7 +51,7 @@ fun createUsers(arguments: Arguments) {
     }
 }
 
-fun setLogLevel(debug: Boolean) {
+private fun setLogLevel(debug: Boolean) {
     val rootLogger: Logger = LogManager.getLogManager().getLogger("")
     val level = if (debug) Level.FINE else Level.INFO
     rootLogger.level = level
@@ -72,7 +60,7 @@ fun setLogLevel(debug: Boolean) {
     }
 }
 
-fun createOneUser(user: FirebaseUser, usersResource: UsersResource, hashParamsId: String?): UserResource? {
+private fun createOneUser(user: FirebaseUser, usersResource: UsersResource, hashParamsId: String?): UserResource? {
     log.fine("Creating user ${user.email}...")
     val keycloakUser = user.convert()
     return try {
@@ -89,12 +77,12 @@ fun createOneUser(user: FirebaseUser, usersResource: UsersResource, hashParamsId
         } else {
             null
         }
-
     }
 }
 
-fun duplicateEmail(user: FirebaseUser, usersResource: UsersResource): UserResource? {
+private fun duplicateEmail(user: FirebaseUser, usersResource: UsersResource): UserResource? {
     log.info("Trying to find existing user with email ${user.email}")
+    // The user search has a tendency to hang so ensure client is alive first
     val users = usersResource.search(user.email, true)
     return if (users.size == 1) {
         log.info("Found the user with id ${users[0].id}")
@@ -115,7 +103,7 @@ fun duplicateEmail(user: FirebaseUser, usersResource: UsersResource): UserResour
     }
 }
 
-fun addUserCredential(userResource: UserResource, user: FirebaseUser, hashParamsId: String?) {
+private fun addUserCredential(userResource: UserResource, user: FirebaseUser, hashParamsId: String?) {
     val credential = CredentialRepresentation()
     val representation = userResource.toRepresentation()
     credential.isTemporary = false
@@ -126,7 +114,7 @@ fun addUserCredential(userResource: UserResource, user: FirebaseUser, hashParams
     userResource.update(representation)
 }
 
-fun addUserRoles(userResource: UserResource, realmResource: RealmResource, clientId: String?, roles: List<String>) {
+private fun addUserRoles(userResource: UserResource, realmResource: RealmResource, clientId: String?, roles: List<String>) {
 
     log.fine("Adding roles for user...")
 
@@ -154,7 +142,7 @@ fun addUserRoles(userResource: UserResource, realmResource: RealmResource, clien
     }
 }
 
-fun FirebaseUser.convert() : UserRepresentation {
+private fun FirebaseUser.convert() : UserRepresentation {
     val user = UserRepresentation()
     user.isEnabled = true
     user.username = email

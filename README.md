@@ -13,7 +13,7 @@ To be used on a Keycloak instance configured with with the [Keycloak Firebase Sc
 ## Download latest release
 
 ```
-curl -L https://github.com/SmartMoveSystems/firebase-keycloak-importer/releases/download/0.0.4/firebase-keycloak-importer-0.0.4.jar > firebase-keycloak-importer-0.0.4.jar
+curl -L https://github.com/SmartMoveSystems/firebase-keycloak-importer/releases/download/0.0.5/firebase-keycloak-importer-0.0.5.jar > firebase-keycloak-importer-0.0.5.jar
 ```
 
 ## Usage
@@ -36,12 +36,12 @@ Export your Firebase project's hash parameters to a JSON file with the format:
 
 Run the following (the args `"--clientId", "--roles", "--clientSecret", "--default", "--debug"` are optional):
 
-The `default` argument specifies that the imported hash parameters will be the ones used for future users. 
-If you are only importing from one Firebase project, you must set this argument to `true`.
-
 ```bash
-java -jar build\libs\firebase-keycloak-importer-0.0.4.jar --usersFile example_users.json --hashParamsFile example_hash_config.json --adminUser support@smartmovetaxis.com --adminPassword admin --realm smartmove --serverUrl http://localhost:8080/auth --default true --debug
+java -jar build\libs\firebase-keycloak-importer-0.0.5.jar --usersFile example_users.json --hashParamsFile example_hash_config.json --adminUser support@smartmovetaxis.com --adminPassword admin --realm smartmove --serverUrl http://localhost:8080/auth --default true
 ```
+
+The `default` argument specifies that the imported hash parameters will be the ones used for future users.
+If you are only importing from one Firebase project, you must set this argument to `true`.
 
 The client with the specified `clientId` and all specified `roles` must already exist in your Keycloak configuration.
 
