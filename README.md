@@ -13,7 +13,7 @@ To be used on a Keycloak instance configured with with the [Keycloak Firebase Sc
 ## Download latest release
 
 ```
-curl -L https://github.com/SmartMoveSystems/firebase-keycloak-importer/releases/download/1.0.0/firebase-keycloak-importer-1.0.0.jar > firebase-keycloak-importer-1.0.0.jar
+curl -L https://github.com/SmartMoveSystems/firebase-keycloak-importer/releases/download/1.0.1/firebase-keycloak-importer-1.0.1.jar > firebase-keycloak-importer-1.0.1.jar
 ```
 
 ## Usage
@@ -37,7 +37,7 @@ Export your Firebase project's hash parameters to a JSON file with the format:
 Run the following (the args `"--clientId", "--roles", "--clientSecret", "--default", "--debug"` are optional):
 
 ```bash
-java -jar build\libs\firebase-keycloak-importer-1.0.0.jar --usersFile example_users.json --hashParamsFile example_hash_config.json --adminUser support@smartmovetaxis.com --adminPassword admin --realm smartmove --serverUrl http://localhost:8080/auth --default true
+java -jar build\libs\firebase-keycloak-importer-1.0.1.jar --usersFile example_users.json --hashParamsFile example_hash_config.json --adminUser support@smartmovetaxis.com --adminPassword admin --realm smartmove --serverUrl http://localhost:8080/auth --default true
 ```
 
 The `default` argument specifies that the imported hash parameters will be the ones used for future users.

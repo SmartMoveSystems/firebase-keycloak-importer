@@ -46,6 +46,7 @@ fun createUsers(arguments: Arguments) {
             }
         }
         log.info("$created of $size users added")
+        keycloak.close()
     } else {
         log.warning("No users found in file")
     }
