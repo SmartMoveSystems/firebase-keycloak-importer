@@ -1,9 +1,9 @@
 package com.smartmovesystems.keycloak.firebasemigrator
 
 import com.smartmovesystems.keycloak.firebasemigrator.model.ScryptHashParametersRepresentation
-import javax.ws.rs.*
-import javax.ws.rs.core.MediaType
-import javax.ws.rs.core.Response
+import jakarta.ws.rs.*
+import jakarta.ws.rs.core.MediaType
+import jakarta.ws.rs.core.Response
 
 @Path("/scrypt-parameters")
 interface HashParametersResource {

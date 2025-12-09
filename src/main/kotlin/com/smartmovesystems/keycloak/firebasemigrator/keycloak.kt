@@ -1,5 +1,7 @@
 package com.smartmovesystems.keycloak.firebasemigrator
 
+import jakarta.ws.rs.client.Client
+import jakarta.ws.rs.client.ClientBuilder
 import org.jboss.resteasy.client.jaxrs.ResteasyClient
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget
@@ -7,8 +9,8 @@ import org.keycloak.OAuth2Constants
 import org.keycloak.admin.client.JacksonProvider
 import org.keycloak.admin.client.Keycloak
 import org.keycloak.admin.client.KeycloakBuilder
-import javax.ws.rs.client.ClientRequestContext
-import javax.ws.rs.client.ClientRequestFilter
+import jakarta.ws.rs.client.ClientRequestContext
+import jakarta.ws.rs.client.ClientRequestFilter
 
 private val Keycloak.webTarget : ResteasyWebTarget
     get() {
@@ -30,8 +32,8 @@ private fun Keycloak.setCloseConnections() {
 }
 
 private val resteasyClientBuilder: ResteasyClientBuilder by lazy {
-    ResteasyClientBuilder()
-        .register(JacksonProvider::class.java, 100)
+    (ResteasyClientBuilder.newBuilder() as ResteasyClientBuilder)
+        .register(JacksonProvider::class.java, 100) as ResteasyClientBuilder
 }
 
 private val restEasyClient: ResteasyClient by lazy {

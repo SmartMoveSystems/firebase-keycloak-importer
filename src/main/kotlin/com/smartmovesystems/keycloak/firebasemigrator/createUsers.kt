@@ -13,7 +13,7 @@ import java.lang.Exception
 import java.util.logging.Level
 import java.util.logging.LogManager
 import java.util.logging.Logger
-import javax.ws.rs.core.Response
+import jakarta.ws.rs.core.Response
 
 private val log = Logger.getLogger("createUsers")
 
@@ -92,7 +92,7 @@ private fun duplicateEmail(user: FirebaseUser, usersResource: UsersResource): Us
         if (phoneNumber != user.phoneNumber) {
             log.info("User's phone number doesn't match; setting to invalid")
             val representation = existing.toRepresentation()
-            representation.singleAttribute("phone_verified", "false")
+            representation.singleAttribute<UserRepresentation>("phone_verified", "false")
             existing.update(representation)
         } else {
             log.info("Phone numbers match; nothing to do here")
@@ -148,6 +148,7 @@ private fun FirebaseUser.convert() : UserRepresentation {
     user.isEnabled = true
     user.username = email
     user.email = email
+    user.isEmailVerified = emailVerified
     val name = displayName?.split(" ")
     user.firstName = name?.let { name[0] }
     if (name?.size ?: 0 > 1) {
@@ -155,14 +156,14 @@ private fun FirebaseUser.convert() : UserRepresentation {
     }
 
     phoneNumber?.let {
-        user.singleAttribute("phone_verified","true")
-        user.singleAttribute("phone_number", it)
+        user.singleAttribute<UserRepresentation>("phone_verified","true")
+        user.singleAttribute<UserRepresentation>("phone_number", it)
     }
 
     customAttributes?.let { attrString ->
         val json = JSONObject(attrString)
         json.keys().forEachRemaining {
-            user.singleAttribute(it, json.get(it).toString())
+            user.singleAttribute<UserRepresentation>(it, json.get(it).toString())
         }
     }
 
