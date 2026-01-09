@@ -12,6 +12,8 @@ repositories {
     jcenter()
 }
 
+val mainClassName = "com.smartmovesystems.keycloak.firebasemigrator.FirebaseKeycloakUserCreator"
+
 dependencies {
 
     val keycloakVersion = "26.4.6" //"11.0.2"
@@ -27,7 +29,7 @@ dependencies {
     implementation("org.apache.httpcomponents:httpcore-nio:4.4.16")
     implementation("org.apache.httpcomponents:httpasyncclient:4.1.5")
     implementation("org.json:json:$jsonVersion")
-    compileOnly("org.keycloak:keycloak-core:$keycloakVersion")
+//    compileOnly("org.keycloak:keycloak-core:$keycloakVersion")
 
     // JUnit
     testImplementation("org.junit.jupiter:junit-jupiter-api:${jUnitVersion}")
@@ -43,7 +45,7 @@ kotlin {
 
 val fatJar = tasks.register<Jar>("fatJar") {
     manifest {
-        attributes["Main-Class"] = "com.smartmovesystems.keycloak.firebasemigrator.FirebaseKeycloakUserCreator" // fully qualified class name of default main class
+        attributes["Main-Class"] = "${mainClassName}" //""com.smartmovesystems.keycloak.firebasemigrator.FirebaseKeycloakUserCreator" // fully qualified class name of default main class
     }
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
@@ -53,5 +55,38 @@ val fatJar = tasks.register<Jar>("fatJar") {
 tasks {
     "build" {
         dependsOn(fatJar)
+    }
+}
+
+
+//##################################### run - JavaExec #######################################
+tasks.register<JavaExec>("runImportUsers") {
+    group = "smartmove"
+    classpath = sourceSets["main"].runtimeClasspath
+
+    mainClass.set("${mainClassName}")
+
+    // arguments to pass to the application
+    val USERS_FILE="example_users.json"
+    val HASH_PARAMS_FILE="example_hash_config.json"
+    val ADMIN_USER="admin@my-keycloak.nowhere"
+    val ADMIN_PASSWORD="test1234"
+    val REALM="myrealm"
+    val SERVER_URL="http://localhost:8080/auth"
+    val DEFAULT=true
+
+    args("--usersFile", "${USERS_FILE}",
+        "--hashParamsFile", "${HASH_PARAMS_FILE}",
+        "--adminUser", "${ADMIN_USER}",
+        "--adminPassword", "${ADMIN_PASSWORD}",
+        "--realm", "${REALM}",
+        "--serverUrl", "${SERVER_URL}",
+        "--default", "${DEFAULT}")
+
+    debugOptions {
+        enabled = true
+        port = 5005
+        server = true
+        suspend = true
     }
 }
